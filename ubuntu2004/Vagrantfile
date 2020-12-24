@@ -68,26 +68,59 @@ Vagrant.configure("2") do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Ansible, Chef, Docker, Puppet and Salt are also available. Please see the
   # documentation for more information about their specific syntax and use.
-  config.vm.provision :root_user, privileged: true, type: "shell", inline: <<-SHELL
+  config.vm.provision :root_user1, privileged: true, type: "shell", inline: <<-SHELL
     apt-get update
     apt-get install -y git curl wget bash
   SHELL
 
   # clone repositories
-  config.vm.provision :vagrant_user, privileged: false, type: "shell", inline: <<-SHELL
-    echo $(whoami)
-
+  config.vm.provision :vagrant_user1, privileged: false, type: "shell", inline: <<-SHELL
     # dotfiles
     git clone https://github.com/junkor-1011/confs_linux.git ${HOME}/.dotfiles
+    # deploy
+    ${HOME}/.dotfiles/deploy.sh
 
     # setting scripts
     git clone https://github.com/junkor-1011/linux_setting_environments.git ${HOME}/.__SETTING__
   SHELL
 
+  # install
+  config.vm.provision :root_user2, privileged: true, type: "shell", inline: <<-SHELL
+    # core
+    /home/vagrant/.__SETTING__/root/core_package_manager/ubuntu/install.sh
+    # github
+    /home/vagrant/.__SETTING__/root/core_package_manager/ubuntu/additional/install_gh.sh
+    # docker
+    /home/vagrant/.__SETTING__/root/docker/ubuntu/install.sh
+    /home/vagrant/.__SETTING__/root/docker/ubuntu/groupadd_docker.sh
+    # login shell (zsh)
+    /home/vagrant/.__SETTING__/root/login_shell/vagrant_login_shell.sh
+  SHELL
+
+  config.vm.provision :vagrant_user2, privileged: false, type: "shell", inline: <<-SHELL
+    # neovim
+    /home/vagrant/.__SETTING__/user/neovim/install.sh
+    /home/vagrant/.__SETTING__/user/dein/install.sh
+    # fzf
+    /home/vagrant/.__SETTING__/user/fzf/install.sh
+    # anyenv
+    /home/vagrant/.__SETTING__/user/anyenv/install.sh
+    /home/vagrant/.__SETTING__/user/anyenv/post_install.sh
+    # zsh-zinit
+    /home/vagrant/.__SETTING__/user/zinit/install.sh
+    # fish-fisher
+    /home/vagrant/.__SETTING__/user/fisher/install.sh
+    # aws-cli(ver2)
+    /home/vagrant/.__SETTING__/user/awscli2/install.sh
+    # terraform
+    /home/vagrant/.__SETTING__/user/terraform/install.sh
+    
+  SHELL
 
   # cleanup
-  config.vm.provision :root_user, privileged: true, type: "shell", inline: <<-SHELL
+  config.vm.provision :root_user3, privileged: true, type: "shell", inline: <<-SHELL
     apt-get clean
     rm -rf /var/lib/apt/lists/*
+    echo "Done cleanup."
   SHELL
 end
