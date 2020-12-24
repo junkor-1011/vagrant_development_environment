@@ -147,8 +147,10 @@ Vagrant.configure("2") do |config|
     
   SHELL
 
-  # cleanup
+  # finish & cleanup
   config.vm.provision :root_user3, privileged: true, type: "shell", inline: <<-SHELL
+    apt-get -y upgrade
+    apt-get -y autoremove
     apt-get clean
     # rm -rf /var/lib/apt/lists/*
     echo "Done cleanup."
