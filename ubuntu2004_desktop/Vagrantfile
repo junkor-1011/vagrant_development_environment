@@ -55,11 +55,25 @@ Vagrant.configure("2") do |config|
 
   config.vm.provider "virtualbox" do |vb|
     # Display the VirtualBox GUI when booting the machine
-    # vb.gui = true
+    vb.gui = true
 
     # Customize the amount of memory on the VM:
     vb.memory = "2048"
+    
     vb.cpus = 2
+    vb.customize [
+      "modifyvm", :id,
+      "--vram", "256",
+      "--clipboard", "bidirectional",
+      "--draganddrop", "bidirectional",
+      "--accelerate3d", "on",
+      "--hwvirtex", "on",
+      "--nestedpaging", "on",
+      "--largepages", "on",
+      "--ioapic", "on",
+      "--pae", "on",
+      "--paravirtprovider", "kvm",
+    ]
   end
   #
   # View the documentation for the provider you are using for more
@@ -68,6 +82,10 @@ Vagrant.configure("2") do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Ansible, Chef, Docker, Puppet and Salt are also available. Please see the
   # documentation for more information about their specific syntax and use.
+  # config.vm.provision "shell", inline: <<-SHELL
+  #   apt-get update
+  #   apt-get install -y apache2
+  # SHELL
   config.vm.provision :root_user1, privileged: true, type: "shell", inline: <<-SHELL
     apt-get update
     apt-get install -y git curl wget bash
@@ -95,6 +113,10 @@ Vagrant.configure("2") do |config|
     /home/vagrant/.__SETTING__/root/docker/ubuntu/groupadd_docker.sh
     # login shell (zsh)
     /home/vagrant/.__SETTING__/root/login_shell/vagrant_login_shell.sh
+    # desktop
+    /home/vagrant/.__SETTING__/root/core_package_manager/ubuntu/additional/install_ubuntu_desktop.sh
+    /home/vagrant/.__SETTING__/root/core_package_manager/ubuntu/additional/install_ubuntu_ja.sh
+
   SHELL
 
   config.vm.provision :vagrant_user2, privileged: false, type: "shell", inline: <<-SHELL
@@ -116,6 +138,10 @@ Vagrant.configure("2") do |config|
     /home/vagrant/.__SETTING__/user/awscli2/install.sh
     # terraform
     /home/vagrant/.__SETTING__/user/terraform/install.sh
+    # GUI keyboard layout
+    /home/vagrant/.__SETTING__/user/setxkbmap/set_keyboard_layout_jp.sh
+
+    # ToDo: font-install(IPA-Font, Nerd-Font, Noto)
 
     cd $HOME
     
