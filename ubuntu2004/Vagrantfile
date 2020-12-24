@@ -58,7 +58,7 @@ Vagrant.configure("2") do |config|
     # vb.gui = true
 
     # Customize the amount of memory on the VM:
-    vb.memory = "2018"
+    vb.memory = "2048"
     vb.cpus = 2
   end
   #
@@ -68,13 +68,25 @@ Vagrant.configure("2") do |config|
   # Enable provisioning with a shell script. Additional provisioners such as
   # Ansible, Chef, Docker, Puppet and Salt are also available. Please see the
   # documentation for more information about their specific syntax and use.
-  config.vm.provision "shell", inline: <<-SHELL
+  config.vm.provision :root_user, privileged: true, type: "shell", inline: <<-SHELL
     apt-get update
     apt-get install -y git curl wget bash
   SHELL
 
+  # clone repositories
+  config.vm.provision :vagrant_user, privileged: false, type: "shell", inline: <<-SHELL
+    echo $(whoami)
+
+    # dotfiles
+    git clone https://github.com/junkor-1011/confs_linux.git ${HOME}/.dotfiles
+
+    # setting scripts
+    git clone https://github.com/junkor-1011/linux_setting_environments.git ${HOME}/.__SETTING__
+  SHELL
+
+
   # cleanup
-  config.vm.provision "shell", inline: <<-SHELL
+  config.vm.provision :root_user, privileged: true, type: "shell", inline: <<-SHELL
     apt-get clean
     rm -rf /var/lib/apt/lists/*
   SHELL
