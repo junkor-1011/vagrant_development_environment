@@ -58,7 +58,7 @@ Vagrant.configure("2") do |config|
     vb.gui = true
 
     # Customize the amount of memory on the VM:
-    vb.memory = "2048"
+    vb.memory = "3072"
     
     vb.cpus = 2
     vb.customize [
@@ -87,12 +87,15 @@ Vagrant.configure("2") do |config|
   #   apt-get install -y apache2
   # SHELL
   config.vm.provision :root_user1, privileged: true, type: "shell", inline: <<-SHELL
+    set -eux
     apt-get update
     apt-get install -y git curl wget bash
   SHELL
 
   # clone repositories
   config.vm.provision :vagrant_user1, privileged: false, type: "shell", inline: <<-SHELL
+    set -eux
+
     # dotfiles
     git clone https://github.com/junkor-1011/confs_linux.git ${HOME}/.dotfiles
     # deploy
@@ -104,6 +107,8 @@ Vagrant.configure("2") do |config|
 
   # install
   config.vm.provision :root_user2, privileged: true, type: "shell", inline: <<-SHELL
+    set -eux
+
     # core
     /home/vagrant/.__SETTING__/root/core_package_manager/ubuntu/install.sh
     # github
@@ -120,6 +125,8 @@ Vagrant.configure("2") do |config|
   SHELL
 
   config.vm.provision :vagrant_user2, privileged: false, type: "shell", inline: <<-SHELL
+    set -eux
+
     # neovim
     /home/vagrant/.__SETTING__/user/neovim/install.sh
     /home/vagrant/.__SETTING__/user/dein/install.sh
@@ -149,6 +156,8 @@ Vagrant.configure("2") do |config|
 
   # finish & cleanup
   config.vm.provision :root_user3, privileged: true, type: "shell", inline: <<-SHELL
+    set -eux
+
     apt-get -y upgrade
     apt-get -y autoremove
     apt-get clean
