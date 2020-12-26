@@ -58,7 +58,7 @@ Vagrant.configure("2") do |config|
     vb.gui = true
 
     # Customize the amount of memory on the VM:
-    vb.memory = "2048"
+    vb.memory = "3072"
     
     vb.cpus = 2
     vb.customize [
@@ -87,12 +87,15 @@ Vagrant.configure("2") do |config|
   #   apt-get install -y apache2
   # SHELL
   config.vm.provision :root_user1, privileged: true, type: "shell", inline: <<-SHELL
+    set -eux
     apt-get update
     apt-get install -y git curl wget bash
   SHELL
 
   # clone repositories
   config.vm.provision :vagrant_user1, privileged: false, type: "shell", inline: <<-SHELL
+    set -eux
+
     # dotfiles
     git clone https://github.com/junkor-1011/confs_linux.git ${HOME}/.dotfiles
     # deploy
@@ -104,6 +107,8 @@ Vagrant.configure("2") do |config|
 
   # install
   config.vm.provision :root_user2, privileged: true, type: "shell", inline: <<-SHELL
+    set -eux
+
     # core
     /home/vagrant/.__SETTING__/root/core_package_manager/ubuntu/install.sh
     # github
@@ -120,6 +125,10 @@ Vagrant.configure("2") do |config|
   SHELL
 
   config.vm.provision :vagrant_user2, privileged: false, type: "shell", inline: <<-SHELL
+    set -eux
+
+    # pip local
+    /home/vagrant/.__SETTING__/user/pip_user/install.sh
     # neovim
     /home/vagrant/.__SETTING__/user/neovim/install.sh
     /home/vagrant/.__SETTING__/user/dein/install.sh
@@ -139,18 +148,28 @@ Vagrant.configure("2") do |config|
     # terraform
     /home/vagrant/.__SETTING__/user/terraform/install.sh
     # GUI keyboard layout
-    /home/vagrant/.__SETTING__/user/setxkbmap/set_keyboard_layout_jp.sh
+    # setxkbmap -layout jp
+    # /home/vagrant/.__SETTING__/user/setxkbmap/set_keyboard_layout_jp.sh
 
-    # ToDo: font-install(IPA-Font, Nerd-Font, Noto)
+    # ToDo: font-install(IPA-Font, Nerd-Font)
 
     cd $HOME
     
   SHELL
 
-  # cleanup
+  # finish & cleanup
   config.vm.provision :root_user3, privileged: true, type: "shell", inline: <<-SHELL
+    set -eux
+
+    apt-get -y upgrade
+    apt-get -y autoremove
     apt-get clean
     # rm -rf /var/lib/apt/lists/*
     echo "Done cleanup."
   SHELL
+
+  # keybord layout (tmp: set manually)
+  # config.vm.provision :vagrant_user_keyboard, privileged: false, type: "shell", inline: <<-SHELL
+  #   setxkbmap -layout jp
+  # SHELL
 end
