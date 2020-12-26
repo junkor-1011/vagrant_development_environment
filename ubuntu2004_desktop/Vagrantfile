@@ -172,4 +172,18 @@ Vagrant.configure("2") do |config|
   # config.vm.provision :vagrant_user_keyboard, privileged: false, type: "shell", inline: <<-SHELL
   #   setxkbmap -layout jp
   # SHELL
+
+  # keybord layout (tmp: set manually)
+  config.vm.provision :vagrant_user_manual_setup, privileged: false, type: "shell", inline: <<-SHELL
+    if [ ! -d $HOME/Desktop ]; then
+        mkdir -p ${HOME}/Desktop
+    fi
+    cp -r ${HOME}/.__SETTING__/user/_desktop_manual_setting/ubuntu ${HOME}/Desktop/
+  SHELL
+
+  # vagrant-vbguest
+  if Vagrant.has_plugin?("vagrant-vbguest")
+      config.vbguest.auto_update = false
+  end
+
 end
